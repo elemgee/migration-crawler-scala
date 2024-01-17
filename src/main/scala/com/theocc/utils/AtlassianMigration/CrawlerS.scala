@@ -9,7 +9,8 @@ import java.io.{File, FileReader, FileWriter}
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Date
-import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
+import scala.annotation.tailrec
+import scala.jdk.CollectionConverters
 
 
 object CrawlerS {
@@ -25,17 +26,17 @@ object CrawlerS {
 
   private val TSFMT = new SimpleDateFormat("yyyyMMddHHmmss")
 
-  val MAX_DEPTH = 3;
+  val MAX_DEPTH = 3
 
 
   def crawl(targ: String, bearerToken: String, depth: Int = 3, rep: CSVPrinter): Unit = {
 
-
+@tailrec
     def _crawl(urls2crawl: List[String], urlsCrawled: List[String], currentDepth: Int): List[String] = urls2crawl match {
       case Nil => urlsCrawled
       case u :: urls => {
 
-        logger.info(s"checking ${u}")
+        logger.info(s"checking $u")
         if (!urlsCrawled.contains(u)) {
           val cnx = Jsoup.connect(u)
           //cnx.header(HEADER_AUTH, s"Bearer ${bearerToken}")
@@ -43,7 +44,7 @@ object CrawlerS {
 
           val statusCode = cnx.response().statusCode()
 
-          logger.debug(s"Status Code for ${u}: ${statusCode}")
+          logger.debug(s"Status Code for $u: $statusCode")
           statusCode match {
             case 200 => {
 
